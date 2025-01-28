@@ -38,7 +38,11 @@ class HomePage extends ConsumerWidget {
                             onPressed: () {
                               ref.read(authProvider.notifier).logout();
                               Navigator.of(context).pop();
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  LoginPage(),));
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginPage(),
+                                  ));
                             },
                             child: const Text("Yes"),
                           )
@@ -50,18 +54,58 @@ class HomePage extends ConsumerWidget {
         ],
       ),
       body: currentIndex == 0
-          ? const Center(child: Text("Profile"))
+          ? Center(
+              child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.black, width: 2),
+                    ),
+                    child:
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text("Username: ${ref.watch(authProvider).username}"),
+                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.black, width: 2),),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                          "AccessToken: ${ref.watch(authProvider).accessToken}"),
+                    ),
+                  ),
+                ],
+              ),
+            ))
           : postsViewModel.isLoading
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
                   itemCount: postsViewModel.posts.length,
                   itemBuilder: (context, index) {
                     final post = postsViewModel.posts[index];
-                    return ListTile(
-                      title: Text(post.title.toString()),
-                      subtitle: Text(post.body.toString()),
-                      leading: CircleAvatar(
-                        child: Text(post.id.toString()),
+                    return Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(color: Colors.black, width: 2),
+                      ),
+                      child: ListTile(
+                        title: Text(post.title.toString(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                        subtitle: Text(post.body.toString(), style: TextStyle(fontSize: 16),),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          child: Text(post.id.toString(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
+                        ),
                       ),
                     );
                   },
@@ -71,8 +115,8 @@ class HomePage extends ConsumerWidget {
         currentIndex: currentIndex,
         onTap: (index) {
           ref.read(currentIndexProvider.notifier).update((state) => index);
-          if(index == 1) {
-         ref.read(postProvider.notifier).getAllPosts();
+          if (index == 1) {
+            ref.read(postProvider.notifier).getAllPosts();
           }
         },
         items: const [

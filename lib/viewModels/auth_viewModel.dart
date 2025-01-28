@@ -6,9 +6,9 @@ import 'package:machine_test_practice/models/user_model.dart';
 import 'package:machine_test_practice/repositories/auth_repository.dart';
 import 'package:machine_test_practice/services/storage_service.dart';
 
-class AuthViewmodel with ChangeNotifier{
-
+class AuthViewmodel with ChangeNotifier {
   String? _accessToken;
+  String? _username;
   UserModel? _userModel;
   bool _isAuthenticated = false;
   bool _isInitialised = false;
@@ -16,67 +16,71 @@ class AuthViewmodel with ChangeNotifier{
   UserModel? get userModel => _userModel;
   bool get isAuthenticated => _isAuthenticated;
   bool get isInitialised => _isInitialised;
-  String get accessToken => _accessToken!;
+  String? get accessToken => _accessToken;
+  String? get username => _username;
 
-  AuthViewmodel(){
+  AuthViewmodel() {
     _persistUser();
   }
 
-
-  Future<void> _persistUser() async{
-    try{
+  Future<void> _persistUser() async {
+    try {
       final _storageService = StorageService();
       final accessToken = await _storageService.getAccessToken();
-      if(accessToken != null) {
+      final username = await _storageService.getUsername();
+      if (accessToken != null) {
         _isAuthenticated = true;
         _userModel = UserModel(accessToken: accessToken);
         _accessToken = accessToken;
+        if (username != null) {
+          _username = username;
+        }
       }
-    } catch(_) {
+    } catch (_) {
       _isAuthenticated = false;
       _userModel = null;
-    } 
+    }
     _isInitialised = true;
     notifyListeners();
   }
 
-  Future<void> login (String username, String password) async {
-
-    try{
+  Future<void> login(String username, String password) async {
+    try {
       final _authRepository = AuthRepository();
       final result = await _authRepository.login(username, password);
-      if(result['accessToken'] != null) {
+      if (result['accessToken'] != null) {
         final _storageService = StorageService();
         await _storageService.saveAccessToken(result['accessToken']);
+        await _storageService.saveUsername(username);
         _accessToken = result['accessToken'];
+        _username = username;
       } else {
         throw Exception("Access token not found");
       }
 
-     _isAuthenticated = true;
+      _isAuthenticated = true;
 
       _userModel = UserModel.fromJson(result);
 
       notifyListeners();
-    } catch(e) {
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
 
   Future<void> logout() async {
-    try{
+    try {
       final _authRepository = AuthRepository();
       await _authRepository.logout();
 
       _isAuthenticated = false;
       _userModel = null;
       notifyListeners();
-    } catch(e) {
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
-
 }
 
-
-final authProvider = ChangeNotifierProvider<AuthViewmodel>((ref) => AuthViewmodel());
+final authProvider =
+    ChangeNotifierProvider<AuthViewmodel>((ref) => AuthViewmodel());

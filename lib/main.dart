@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:machine_test_practice/views/login_page.dart';
+import 'package:machine_test_practice/views/home_page.dart';
+// import 'package:machine_test_practice/views/login_page.dart';
 
 void main() {
   runApp(ProviderScope(child: const MyApp()));
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }

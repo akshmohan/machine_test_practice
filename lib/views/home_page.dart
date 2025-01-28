@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
 import 'package:machine_test_practice/viewModels/posts_viewModel.dart';
+import 'package:machine_test_practice/views/login_page.dart';
 
 final currentIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -34,7 +36,9 @@ class HomePage extends ConsumerWidget {
                               child: const Text("No")),
                           TextButton(
                             onPressed: () {
-                              // Add logout logic here
+                              ref.read(authProvider.notifier).logout();
+                              Navigator.of(context).pop();
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  LoginPage(),));
                             },
                             child: const Text("Yes"),
                           )

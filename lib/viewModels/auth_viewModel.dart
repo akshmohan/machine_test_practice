@@ -63,6 +63,19 @@ class AuthViewmodel with ChangeNotifier{
     }
   }
 
+  Future<void> logout() async {
+    try{
+      final _authRepository = AuthRepository();
+      await _authRepository.logout();
+
+      _isAuthenticated = false;
+      _userModel = null;
+      notifyListeners();
+    } catch(e) {
+      throw Exception(e.toString());
+    }
+  }
+
 }
 
 

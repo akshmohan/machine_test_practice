@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,78 +15,97 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(currentIndexProvider);
     final postsViewModel = ref.watch(postProvider);
+    final authViewModel = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home Page"),
         actions: [
           IconButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Logout"),
-                        content: const Text("Are you sure you want to logout?"),
-                        actions: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("No")),
-                          TextButton(
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                              Navigator.of(context).pop();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginPage(),
-                                  ));
-                            },
-                            child: const Text("Yes"),
-                          )
-                        ],
-                      );
-                    });
-              },
-              icon: const Icon(Icons.logout))
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Logout"),
+                    content: const Text("Are you sure you want to logout?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("No"),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Perform logout
+                          await ref.read(authProvider.notifier).logout();
+
+                          // Close the dialog
+                          Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Logged out successful!"),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+
+                          // Navigate to LoginPage
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        },
+                        child: const Text("Yes"),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            icon: const Icon(Icons.logout),
+          ),
         ],
       ),
       body: currentIndex == 0
           ? Center(
               child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.black, width: 2),
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(color: Colors.black, width: 2),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text(
+                            "Username: ${ref.watch(authProvider).username}"),
+                      ),
                     ),
-                    child:
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text("Username: ${ref.watch(authProvider).username}"),
-                        ),
-                  ),
-                  const SizedBox(height: 10),
-                  Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.black, width: 2),),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(
-                          "AccessToken: ${ref.watch(authProvider).accessToken}"),
+                    const SizedBox(height: 10),
+                    Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(color: Colors.black, width: 2),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text(
+                            "AccessToken: ${ref.watch(authProvider).accessToken}"),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ))
+            )
           : postsViewModel.isLoading
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
@@ -100,11 +119,18 @@ class HomePage extends ConsumerWidget {
                         side: BorderSide(color: Colors.black, width: 2),
                       ),
                       child: ListTile(
-                        title: Text(post.title.toString(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                        subtitle: Text(post.body.toString(), style: TextStyle(fontSize: 16),),
+                        title: Text(post.title.toString(),
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        subtitle: Text(post.body.toString(),
+                            style: TextStyle(fontSize: 16)),
                         leading: CircleAvatar(
                           backgroundColor: Colors.grey,
-                          child: Text(post.id.toString(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
+                          child: Text(post.id.toString(),
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
                         ),
                       ),
                     );

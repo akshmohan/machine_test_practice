@@ -13,7 +13,6 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
-
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -21,81 +20,173 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   late final authViewModel = ref.watch(authProvider);
 
+  final isObscureProvider = StateProvider<bool>((ref) => true);
+
+  final isLoadingProvider = StateProvider<bool>((ref) => false);
+
   @override
   void dispose() {
-    super.dispose();
-    
     usernameController.dispose();
     passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(children: [
-      Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/loginpage.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Form(
-            key: key,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                      label: const Text("Username", style: TextStyle(color: Colors.white),),
-                      hintText: "Enter username",
-                      hintStyle: TextStyle(color: Colors.white),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                      )),
-                ),
-                const SizedBox(height: 30),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    label: const Text("Password", style: TextStyle(color: Colors.white),),
-                    hintText: "Enter password",
-                     hintStyle: TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    child: const Text("Login"),
-                    onPressed: () async{
-                      if (key.currentState!.validate()) {
-                      await authViewModel.login(usernameController.text.trim(), passwordController.text.trim());
+    final isObscure = ref.watch(isObscureProvider);
+    final isLoading = ref.watch(isLoadingProvider);
 
-                      if(authViewModel.isAuthenticated) {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-                      }
-                      }
-                    },
-                  ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Main Background with Login Form
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/loginpage.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Form(
+                key: key,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextFormField(
+                      style: const TextStyle(color: Colors.white),
+                      controller: usernameController,
+                      decoration: const InputDecoration(
+                        label: Text(
+                          "Username",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        hintText: "Enter username",
+                        hintStyle: TextStyle(color: Colors.white),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    TextFormField(
+                      style: const TextStyle(color: Colors.white),
+                      obscureText: isObscure,
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        label: const Text(
+                          "Password",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        hintText: "Enter password",
+                        hintStyle: const TextStyle(color: Colors.white),
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        suffixIcon: IconButton(
+                          color: Colors.white,
+                          icon: Icon(isObscure
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            ref.read(isObscureProvider.notifier).state =
+                                !isObscure;
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                if (key.currentState!.validate()) {
+                                  // Start loading
+                                  ref.read(isLoadingProvider.notifier).state =
+                                      true;
+
+                                  try {
+                                    await authViewModel.login(
+                                      usernameController.text.trim(),
+                                      passwordController.text.trim(),
+                                    );
+                                    // If login is successful, navigate to HomePage
+                                    if (authViewModel.isAuthenticated) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Logged in successfully!"),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const HomePage(),
+                                        ),
+                                      );
+                                    } else {
+                                      // Handle failed login case
+                                    
+                                    }
+                                  } catch (e) {
+                                    // Handle error case
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text(
+                                              "Invalid Credentials!"),
+                                          content: const Text(
+                                              "The username or password you entered is incorrect. Please try again."),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text("OK"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                  } finally {
+                                    // Stop loading
+                                    ref.read(isLoadingProvider.notifier).state =
+                                        false;
+                                  }
+                                }
+                              },
+                        child: const Text("Login"),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      )
-    ]));
+
+          // Overlay Loading Indicator
+          if (isLoading)
+            Container(
+              color: Colors.black.withAlpha(128), // Semi-transparent background
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

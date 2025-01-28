@@ -12,12 +12,14 @@ class AuthViewmodel with ChangeNotifier {
   UserModel? _userModel;
   bool _isAuthenticated = false;
   bool _isInitialised = false;
+  bool _isLoading = false;
 
   UserModel? get userModel => _userModel;
   bool get isAuthenticated => _isAuthenticated;
   bool get isInitialised => _isInitialised;
   String? get accessToken => _accessToken;
   String? get username => _username;
+  bool get isLoading => _isLoading;
 
   AuthViewmodel() {
     _persistUser();
@@ -46,6 +48,8 @@ class AuthViewmodel with ChangeNotifier {
 
   Future<void> login(String username, String password) async {
     try {
+      _isLoading = true;
+      notifyListeners();
       final _authRepository = AuthRepository();
       final result = await _authRepository.login(username, password);
       if (result['accessToken'] != null) {
@@ -62,7 +66,11 @@ class AuthViewmodel with ChangeNotifier {
 
       _userModel = UserModel.fromJson(result);
 
+        _isLoading = false;
+
       notifyListeners();
+
+  
     } catch (e) {
       throw Exception(e.toString());
     }

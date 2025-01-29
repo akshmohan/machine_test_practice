@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:machine_test_practice/config/routes.dart';
 import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
 import 'package:machine_test_practice/viewModels/posts_viewModel.dart';
 import 'package:machine_test_practice/views/login_page.dart';
@@ -52,12 +53,8 @@ class HomePage extends ConsumerWidget {
                           );
 
                           // Navigate to LoginPage
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          );
+                                                             Navigator.pushNamedAndRemoveUntil(context, Routes.loginPage, (route) => false);
+
                         },
                         child: const Text("Yes"),
                       ),

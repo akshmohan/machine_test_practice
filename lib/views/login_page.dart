@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:machine_test_practice/config/routes.dart';
 import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
 import 'package:machine_test_practice/views/home_page.dart';
 
@@ -39,7 +40,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Main Background with Login Form
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -129,17 +129,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         ),
                                       );
 
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const HomePage(),
-                                        ),
-                                      );
-                                    } else {
-                                      // Handle failed login case
-                                    
-                                    }
+                                     Navigator.pushNamedAndRemoveUntil(context, Routes.homePage, (route) => false);
+                                    } 
                                   } catch (e) {
                                     // Handle error case
                                     showDialog(
@@ -175,10 +166,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
           ),
 
-          // Overlay Loading Indicator
           if (isLoading)
             Container(
-              color: Colors.black.withAlpha(128), // Semi-transparent background
+              color: Colors.black.withAlpha(128), 
               child: const Center(
                 child: CircularProgressIndicator(
                   color: Colors.white,

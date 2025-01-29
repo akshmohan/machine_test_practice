@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:machine_test_practice/config/routes.dart';
 import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
 import 'package:machine_test_practice/views/home_page.dart';
 import 'package:machine_test_practice/views/login_page.dart';
@@ -31,6 +32,7 @@ class MyApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      routes: Routes.route,
       home: authViewModel.isAuthenticated ? const HomePage() : const LoginPage(),
     );
   }

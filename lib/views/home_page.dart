@@ -46,7 +46,7 @@ class HomePage extends ConsumerWidget {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Logged out successful!"),
+                              content: Text("Logged out successfully!"),
                               duration: Duration(seconds: 2),
                             ),
                           );

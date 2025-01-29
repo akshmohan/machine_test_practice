@@ -3,9 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:machine_test_practice/config/routes.dart';
+import 'package:machine_test_practice/core/custom_dialog.dart';
+import 'package:machine_test_practice/core/snackbar.dart';
 import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
 import 'package:machine_test_practice/viewModels/posts_viewModel.dart';
-import 'package:machine_test_practice/views/login_page.dart';
 
 final currentIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -27,9 +28,9 @@ class HomePage extends ConsumerWidget {
               showDialog(
                 context: context,
                 builder: (context) {
-                  return AlertDialog(
-                    title: const Text("Logout"),
-                    content: const Text("Are you sure you want to logout?"),
+                  return CustomDialog(
+                    title: "Logout",
+                    content: "Are you sure you want to logout?",
                     actions: [
                       TextButton(
                         onPressed: () {
@@ -45,16 +46,11 @@ class HomePage extends ConsumerWidget {
                           // Close the dialog
                           Navigator.of(context).pop();
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Logged out successfully!"),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
+                          showSnackBar(context, "Logged out successfully");
 
                           // Navigate to LoginPage
-                                                             Navigator.pushNamedAndRemoveUntil(context, Routes.loginPage, (route) => false);
-
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, Routes.loginPage, (route) => false);
                         },
                         child: const Text("Yes"),
                       ),

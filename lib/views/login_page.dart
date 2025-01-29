@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:machine_test_practice/config/routes.dart';
+import 'package:machine_test_practice/core/custom_dialog.dart';
+import 'package:machine_test_practice/core/custom_text_field.dart';
 import 'package:machine_test_practice/core/loader.dart';
+import 'package:machine_test_practice/core/snackbar.dart';
 import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
-import 'package:machine_test_practice/views/home_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -55,52 +57,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextFormField(
-                      style: const TextStyle(color: Colors.white),
+                    CustomTextField(
                       controller: usernameController,
-                      decoration: const InputDecoration(
-                        label: Text(
-                          "Username",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        hintText: "Enter username",
-                        hintStyle: TextStyle(color: Colors.white),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
+                      label: "Username",
+                      hintText: "Enter Username",
                     ),
                     const SizedBox(height: 30),
-                    TextFormField(
-                      style: const TextStyle(color: Colors.white),
-                      obscureText: isObscure,
+                    CustomTextField(
                       controller: passwordController,
-                      decoration: InputDecoration(
-                        label: const Text(
-                          "Password",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        hintText: "Enter password",
-                        hintStyle: const TextStyle(color: Colors.white),
-                        enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        suffixIcon: IconButton(
-                          color: Colors.white,
-                          icon: Icon(isObscure
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                          onPressed: () {
-                            ref.read(isObscureProvider.notifier).state =
-                                !isObscure;
-                          },
-                        ),
+                      label: 'Password',
+                      hintText: 'Enter password',
+                      obscureText: isObscure,
+                      suffixIcon: IconButton(
+                        color: Colors.white,
+                        icon: Icon(isObscure
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () {
+                          ref.read(isObscureProvider.notifier).state =
+                              !isObscure;
+                        },
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -111,7 +87,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ? null
                             : () async {
                                 if (key.currentState!.validate()) {
-                                  // Start loading
                                   ref.read(isLoadingProvider.notifier).state =
                                       true;
 
@@ -120,27 +95,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       usernameController.text.trim(),
                                       passwordController.text.trim(),
                                     );
-                                    // If login is successful, navigate to HomePage
                                     if (authViewModel.isAuthenticated) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Logged in successfully!"),
-                                          duration: Duration(seconds: 2),
-                                        ),
-                                      );
+                                      showSnackBar(
+                                          context, "Logged in successfully!");
 
-                                     Navigator.pushNamedAndRemoveUntil(context, Routes.homePage, (route) => false);
-                                    } 
+                                      Navigator.pushNamedAndRemoveUntil(context,
+                                          Routes.homePage, (route) => false);
+                                    }
                                   } catch (e) {
-                                    // Handle error case
                                     showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text(
-                                              "Invalid Credentials!"),
-                                          content: const Text(
-                                              "The username or password you entered is incorrect. Please try again."),
+                                      context: context,
+                                      builder: (context) {
+                                        return CustomDialog(
+                                          title: "Invalid Credentials!",
+                                          content:
+                                              "The username or password you entered is incorrect. Please try again.",
                                           actions: [
                                             TextButton(
                                               onPressed: () {
@@ -149,10 +118,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                               child: const Text("OK"),
                                             ),
                                           ],
-                                        ),
-                                      );
+                                        );
+                                      },
+                                    );
                                   } finally {
-                                    // Stop loading
                                     ref.read(isLoadingProvider.notifier).state =
                                         false;
                                   }
@@ -166,12 +135,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
             ),
           ),
-
           if (isLoading)
             Container(
-              color: Colors.black.withAlpha(128), 
-              child: const Loader()
-            ),
+                color: Colors.black.withAlpha(128), child: const Loader()),
         ],
       ),
     );

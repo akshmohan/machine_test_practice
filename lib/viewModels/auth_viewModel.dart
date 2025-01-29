@@ -66,11 +66,9 @@ class AuthViewmodel with ChangeNotifier {
 
       _userModel = UserModel.fromJson(result);
 
-        _isLoading = false;
+      _isLoading = false;
 
       notifyListeners();
-
-  
     } catch (e) {
       throw Exception(e.toString());
     }

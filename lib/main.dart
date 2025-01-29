@@ -6,7 +6,7 @@ import 'package:machine_test_practice/views/home_page.dart';
 import 'package:machine_test_practice/views/login_page.dart';
 
 void main() {
-  runApp(const ProviderScope(child:  MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -14,17 +14,17 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authViewModel = ref.watch(authProvider);
 
-  final authViewModel = ref.watch(authProvider);
-
-  if(!authViewModel.isInitialised) {
-    return const MaterialApp(
-      home:  Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-      )),
-    );
-  }
+    if (!authViewModel.isInitialised) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
 
     return MaterialApp(
       title: 'Flutter Demo',
@@ -33,7 +33,8 @@ class MyApp extends ConsumerWidget {
         useMaterial3: true,
       ),
       routes: Routes.route,
-      home: authViewModel.isAuthenticated ? const HomePage() : const LoginPage(),
+      home:
+          authViewModel.isAuthenticated ? const HomePage() : const LoginPage(),
     );
   }
 }

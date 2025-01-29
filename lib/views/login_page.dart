@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:machine_test_practice/config/routes.dart';
+import 'package:machine_test_practice/core/loader.dart';
 import 'package:machine_test_practice/viewModels/auth_viewModel.dart';
 import 'package:machine_test_practice/views/home_page.dart';
 
@@ -169,11 +170,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           if (isLoading)
             Container(
               color: Colors.black.withAlpha(128), 
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-              ),
+              child: const Loader()
             ),
         ],
       ),
